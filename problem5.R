@@ -1,5 +1,11 @@
 library(tidyverse)
 
+# Given that the probability of a specific outcome over a continuous distribution is always 0,
+# the decision was made to calculate the probability of the value being between the projected 
+# value +/- 0.05 as WAR is usually reported to one decimal place and 0.05 would facilitate rounding 
+# up or down. An initial data frame is created and additional columns are added for the probability 
+# as well as unweighted and weighted playing time predictions.
+
 season <- c(1:12)
 WAR_per_S <- c(-2.6, -1.5, -0.5, 0.2, 0.8, 1.4, 1.5, 1.4, 1.2, 0.9, 0.5, -0.1)
 sd <- c(0.2, 0.7, 1.0, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.4, 2.6, 2.8)

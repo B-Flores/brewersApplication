@@ -14,8 +14,18 @@ output:
 
 ### **Problem 1**
 Assume that in every inning a starting pitcher pitches he’s projected to give up 0 runs 60% of the time and 1 run 40% of the time. Assume similarly that a relief pitcher is projected to give up 0 runs 70% of the time and 1 run 30% of the time. Assume the starting pitcher will throw 165 innings and the relief pitcher will throw 50 innings in a season. What are the odds that the starting pitcher gives up less runs on a per-inning basis than the relief pitcher?
+\
+\
+**The probability of that the starting pitcher outperforms the relief pitcher on a per-inning basis is **
+**about 9.29%. The odds are therefore 0.102/1.** 
 
 ```{r echo=TRUE}
+#The probability of an even occurring k times over n trials is
+#a randomly distributed binomial variable. We simulate this
+# using rbinom() over a million iterations to estimate the 
+#proportion of average successes over 165 or 50 innings given 
+#the respective pitcher.
+
 #starting pitcher simulation
 sp <- rbinom(n = 1000000, size = 165, prob = 0.4) 
 sp <- sp / 165
@@ -25,6 +35,10 @@ sp <- sp / 165
 rp <- rbinom(n = 1000000, size = 50, prob = 0.3)
 rp <- rp / 50
 
+#We then take the results and logically evaluate each vector
+#in order to create a probability that the starting pitcher 
+#outperforms the relief pitcher.
+
 #result
 
 result <- sp < rp
@@ -33,7 +47,7 @@ num <- (sum(result, na.rm = TRUE))/1000000
 odds <- num/(1-num)
 
 ```
-The probability of that the starting pitcher outperforms the relief pitcher on a per-inning basis is `r num*100`%. The odds are therefore **`r odds`/1**. 
+ 
 \
 \
 \
@@ -42,7 +56,36 @@ The probability of that the starting pitcher outperforms the relief pitcher on a
 A pitcher throws 60% of his fastballs in the strike zone. Given that a pitch is in the strike zone, the home plate umpire is known to call a strike 75% of the time, and given a pitch out of the strike zone he is known to call a ball 65% of the time. A fastball from this pitcher in a game with the umpire behind the plate is called a ball. What is the probability that that pitch was in the strike zone?
 \
 \
+We are given 3 conditional probabilities. Their complements are easily determined as well:
 \
+\
+
+$$P(IN SZ | FB) = 0.6 \implies P(OUTSZ|FB) = 0.4$$
+
+$$P(STRIKE|INSZ)=0.75 \implies P(BALL|INSZ) = 0.25$$
+
+$$P(STRIKE|OUTSZ)=0.35 \implies P(BALL|OUTSZ) = 0.0.65$$
+\
+In order to visualize these conditional probabilities, we can construct the decision trees below:
+\
+\
+![](Images/brewers_p2_1.PNG)
+\
+\
+Furthermore, we can connect the three decision trees as shown below by connecting the leaves of the first tree to the roots of the others:
+\
+\
+![](Images/brewers_p2_2.PNG)
+\
+\
+The question asks us to calculate the following:
+\
+\
+$$P(INSZ|FB\cap BALL)$$
+\
+\
+We do this by calculated the proportion of events "INSZ" that are included within both "FB" and "BALL" out of the total amount of events that include both "FB" and "BALL." This gives us:
+$$P(INSZ|FB\cap BALL) = \frac{0.25\cdot0.6}{(0.25\cdot0.6)+(0.65\cdot0.4)}\approx .3658 $$
 
 ### **Problem 3**
 A linear regression model with a normal error term is fit to predict ERA as a function of K% (strikeouts per plate appearance) and BB% (walks per plate appearance) for pitchers. The estimated coefficients on the linear model are as follows:
@@ -56,6 +99,13 @@ Slope on BB%: 11.4
 Residual standard error/standard deviation of error on estimates: 1.31 
 
 a) What is the probability that a pitcher with a K% of 0.20 and a BB% of 0.10 outperforms a pitcher with a K% of 0.25 and a BB% of 0.20 under this model?
+\
+\
+**Under this model, the pitcher with K% = 0.2 and BB% = 0.1 will outperform the pitcher with K% = 0.25 and BB% =** **0.20 approximately 66.38% of the time.**
+\
+\
+
+
 ```{r}
 #Predicted ERA values for each pitcher based on model
 Pitcher1_ERA <- 5.81 - (11.7 * 0.2) + (11.4 * 0.1) # = 4.61
@@ -66,38 +116,51 @@ Pitcher2_ERA <- 5.81 - (11.7 * 0.25) + (11.4 * 0.2) # = 5.165
 prob <- pnorm(5.164, mean = 4.61, sd = 1.31)
 ```
 
-Under this model, the pitcher with K% = 0.2 and BB% = 0.1 will outperform the pitcher with K% = 0.25 and BB% = 0.20 approximately **`r prob*100`%** of the time. 
+\
+\
 
 b) If Hit by Pitches per PA were to be added to this model, would you expect the coefficient on BB% to be greater or lower in magnitude? Why? 
 \
 \
-I would expect the coefficient for BB% to go down if Hit By Pitches per PA were added
-since BB% is most likely directly correlated to ERA as well as the fact that HBP/PA
-is a subset of BB%. This would split the effect that BB% has on ERA into BB% and HBP%.
-We can probably safely assume that HBP/PA is also directly correlated to ERA, and would
-therefore be a positive coefficient. Therefore, if the coefficient for BB% were to go
-up with the addition of HBP/PA, then...
+**I would expect the coefficient for BB% to go down if Hit By Pitches per PA were added**
+**since BB% is most likely directly correlated to ERA as well as the fact that HBP/PA**
+**is a subset of BB%. This would split the effect that BB% has on ERA into BB% and HBP/PA, and** 
+**therefore decreasing the value of the coefficient on BB% in exchange for the added coefficient on HBP/PA.** 
+\
+\
+
 
 
 
 c) On the same data set, a logistic regression model is fit with the dependent variable being 1 if ERA is less than 4.00 and 0 if ERA is greater than 4.00. The estimated coefficients on the logistic regression model are as follows: Intercept: -2.18 K%: 15.9 BB%: -16.1 Is the marginal effect of K% on the probability of having an ERA < 4.00 larger for someone with a K% of 0.20 and BB% of 0.10 or a pitcher with a K% of 0.25 and BB% of 0.20?
-
+\
+\
+**The marginal effect of K% on the probability of a pitcher's ERA being less than 4.00**
+**is greater for the pitcher with K% = 0.2 and BB% = 0.1. This implies that the first**
+**pitcher's ERA would benefit more from increasing his K% than the second pitcher based**
+**on this model.**
+\
+\
 ```{r}
+# Create a function for the partial derivative wrt K% given a logistic regression model
+# and the given coefficients
 fun <- deriv(expression((exp(-2.18+(15.9*x1)-16.1*x2))/(1+exp(-2.18+(15.9*x1)-16.1*x2))), c("x1", "x2"), function.arg = TRUE)
+
+#Evaluate marginal effect of K% on P(ERA < 4.00) for each pitcher
 fun(0.2, 0.1)
 fun(0.25, 0.2)
 ```
-
-The marginal effect of K% on the probability of a pitcher's ERA being less than 4.00
-is greater for the pitcher with K% = 0.2 and BB% = 0.1. This implies that the first
-pitcher's ERA would benefit more from increasing his K% than the second pitcher based
-on this model.
 \
+\
+
 
 d) If forced to choose between these linear or logistic models based on K% and BB%, which would
 you prefer to use to determine the quality of a pitcher from only their K% and BB%? Why?
 \
 \
+**I would prefer the linear model as general purpose tool in determining the quality of a pitcher. Although** **classifying pitchers into different categories can be useful, I don't think separating pitchers into 2** 
+**categories is generally helpful. For example in this problem, pitchers are classified by the model** **projecting an ERA of lesser or greater than 4. This exercise could be helpful in filtering out potential** **candidates, but there is also a significant difference in production from a 4.00 ERA pitcher and a** 
+**2.00 or even a 3.00 ERA pitcher over the course of a season. **
 \
 
 ### **Problem 4**
@@ -112,6 +175,9 @@ opponents. For what value of p would give the Braves a 50% chance of winning the
 
 ```{r message=FALSE}
 library(tidyverse)
+
+# This function (taking in p as an argument) simulates the last three series for the Mets and Braves. 
+# This simulation assumes that the braves have 9 games left and the mets have 8 games left. The probability of the braves winning the division is simulating using randomly distributed binomial variables defined by the values above and evaluated logically as "braves_win_div" given each case that this is possible. The results are summed up and averaged over 1 million iterations and returned as a percentage.
 
 braves_mets_sim <- function(p){
   braves_mets <- rbinom(1000000, 3, 0.5)
@@ -128,16 +194,25 @@ braves_mets_sim <- function(p){
   return(sum(braves_win_div, na.rm = TRUE) / 1000000)
 }
 
-range <- seq(0.5, 0.85, by = 0.05)
-range <- seq(0.8, 0.84, by = 0.001)
+#An initial range of values for p is defined to pass into the simulation. This narrows down the 
+# range that would result in a win % of 0.5.
+range1 <- seq(0.5, 0.85, by = 0.05)
 
-values <- map_dbl(.x = range, .f = ~braves_mets_sim(.x))
+range2 <- seq(0.8, 0.84, by = 0.001)
+
+values <- map_dbl(.x = range2, .f = ~braves_mets_sim(.x))
 
 
+# We plot the Projected Prob of Winning the division over the range of values for P 
+# and estimate an approximate answer given the graph 
 
-plot(range, values)
+plot(range2, values, xlab = "Values for p", ylab = "Projected Chance of Winning Division")
+abline(h=0.5,col="blue")
+abline( v=0.8285, col = "red")
 ```
-
+\
+\
+As shown above, an appropriate value for p would be approximately **p = 0.8285**. 
 \
 \
 \
@@ -161,12 +236,15 @@ PlayingTime (PA) = \left\{\begin{aligned}
 
 What is this player’s total expected MLB-level playing time over the 7-year period where the
 projected cumulative playing time is at a maximum?
+\
+\
+
 
 ```{r include=FALSE}
 library(knitr)
 library(kableExtra)
 ```
-
+ 
 ```{r echo=FALSE}
 season <- c(1:12)
 WAR_per_S <- c(-2.6, -1.5, -0.5, 0.2, 0.8, 1.4, 1.5, 1.4, 1.2, 0.9, 0.5, -0.1)
@@ -176,9 +254,18 @@ kable(df, col.names = c("Season", "Mean WAR/S Projection","StandardDeviation"), 
   kable_styling(bootstrap_options = "bordered")
 
 ```
+\
+\
+The expected cumulative playing time is estimated to be about **264 Plate Attempts**.
 
 ```{r}
 library(tidyverse)
+
+# Given that the probability of a specific outcome over a continuous distribution is always 0,
+# the decision was made to calculate the probability of the value being between the projected 
+# value +/- 0.05 as WAR is usually reported to one decimal place and 0.05 would facilitate rounding 
+# up or down. An initial data frame is created and additional columns are added for the probability 
+# as well as unweighted and weighted playing time predictions.
 
 
 #Calculating P(WAR-0.05 < X < WAR+0.05)
@@ -207,7 +294,7 @@ View(df)
 
 answer <- sum(df$PA_weighted) # = 264.0842 PA
 ```
-The expected cumulative playing time is estimated to be **`r answer` Plate Attempts**. 
+
 \
 \
 \
@@ -216,6 +303,18 @@ The expected cumulative playing time is estimated to be **`r answer` Plate Attem
 Given the following information, describe how you would construct a model to predict the likelihood of a flyball out on a flyball to the outfield:
 Identities of all players on field (fielders, pitcher, batter, runners), game state (number of outs, runners on base, inning, score), temperature, crowd size, batted ball launch characteristics (exit velocity, launch angle, spray angle, hang time), outfielder fielding percentage, stadium characteristics (fence distance and height), day/night game, pitcher/batter historical matchup results, initial fielder positioning data.
 Note: There is no need to find data and generate an actual model. Please just describe how you would proceed assuming you had the data listed. Please limit your response to 300 words.
+\
+\
+**For this model I would start by choosing data that may affect the chance of a flyball being caught** 
+**in the outfield. This would include: Identities of all players (specifically outfielders; possibly **
+**batters and pitchers), temperature, crowd size, batted ball launch characteristics, outfielder** 
+**fielding percentages, stadium characteristics, day/night game, and initial fielder positioning data.**
+**Next I would start by developing a multiple logistic regression model calculating the probability **
+**that the flyball in the outfield is caught. Depending on the data that is used in creating the model,** 
+**I would try to validate the model given another data set to test the accuracy of the model over a** **significant number of data points. Analysis of this validation procedure would likely show weaknesses **
+**in the model, and so the model would likely need to be updated with either additional data or possibly** 
+**a change in the existing model such as ignoring values that don't have a significant effect on the **
+**outcome. **
 
 
 \
@@ -240,7 +339,21 @@ knitr::kable(dfB, caption = "Player B", col.names = c("Season", "WAR/S","Salary 
   kable_styling(bootstrap_options = "bordered")
 ```
 
-Assuming you had to pick one of these two deals, which player would you recommend the Brewers sign. Note: there are no forfeited draft picks or any other compensation required for the contracts. Please explain your process and any assumptions you make. Please limit your answer to 300 words
+Assuming you had to pick one of these two deals, which player would you recommend the Brewers sign. Note: there are no forfeited draft picks or any other compensation required for the contracts. Please explain your process and any assumptions you make. Please limit your answer to 300 words.
+\
+\
+**Given the Brewers' goals over the next 4 years and the projections of how the current team would align** 
+**with these goals in mind would affect my answer as well as whether there are other options at each** **infielder's respective position. Also given both Players A and B, it seems likely that Player B would** 
+**be a veteran major league player given the projected decline in WAR/S over the contract length and that** **Player A is relatively young since they are projected to remain stable over the 4 year contract. Over** 
+**the 4 years, Player A is projected to accumulate 5.5 WAR for \$21M and Player B is projected to** 
+**accumulate 7.8 WAR for \$40M. Therefore Player A is worth about 0.26 WAR per million dollars spent** 
+**and Player B is worth just under 0.2 WAR per million dollars spent. Suppose the Brewers goal is to **
+**win more as soon as possible in order to make a push at winning the division or making a wild card run, **
+**and that both Players A and B would be a significant upgrade at their given position. The decision seems** **fairly clear that Player B would likely be worth the investment as the projected additional 2 WAR above** **Player A over the first season would align more with the goals and would more likely push the **
+**organization over the line in a tight race. Now suppose the division is more competitive, and although** **winning is always the end goal, the organization is more focused on developing talent over the next** 
+**couple of years. This would be an indicator that Player A's contract could be more beneficial in the **
+**long run if saving money while remaining relatively competitive at their position is likely.  **
+
 
 \
 \
@@ -248,3 +361,13 @@ Assuming you had to pick one of these two deals, which player would you recommen
 
 ### **Problem 8**
 In 2022, two minor leagues used an automated ball-strike (ABS) challenge system, in which the umpire calls balls and strikes, but the pitcher, catcher, and batter may challenge the call. Each team is allocated three challenges per game with successful challenges retained. If this system were to be implemented in the majors in 2024, how should teams adjust their team building and gameplay strategies to prepare? Please limit your answer to 300 words.
+\
+\
+**If this system were to be implemented, it would be beneficial to extract value from the changes by** 
+**maximizing the number of challenges that overturn calls for the team issuing the challenge, and also**
+**by minimizing the calls overturned by opposing teams issuing challenges. Given this objective, data** **gathering over the 2023 season could be crucial in hitting the ground running for the 2024 season. This**
+**could take shape on one side by gathering data throughout games where players signal that they would have** **challenged a specific call, and going into 2024, the analysis of this data would likely imply which **
+**players in the organization have the highest likelihood of overturning a challenged call, and in turn** **retaining the challenge. On the other hand, analysis of a batter's ability to take balls and swing at** **strikes close to the edge of the strike zone (chase-rate) would help in minimizing the number of** 
+**challenges overturned in favor of the opposing team. Similarly, analyzing a pitcher's deceptiveness** 
+**given off-speed movement or pitch-trajectory could influence a batter's ability to challenge** 
+**balls/strikes and should be leveraged accordingly. Additionally, game states should come into play when** **analyzing challenges as retaining challenges for high-leverage situations will likely be key to a team's** **success.** 

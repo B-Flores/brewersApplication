@@ -22,6 +22,9 @@ pnorm(5.164, mean = 4.61, sd = 1.31)
 
 #PART c) 
 
+# Create a function for the partial derivative wrt K% given a logistic regression model
+# and the given coefficients
+
 fun <- deriv(expression((exp(-2.18+(15.9*x1)-16.1*x2))/(1+exp(-2.18+(15.9*x1)-16.1*x2))), c("x1", "x2"), function.arg = TRUE)
 fun(0.2, 0.1)
 fun(0.25, 0.2)
