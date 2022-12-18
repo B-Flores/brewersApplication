@@ -125,9 +125,9 @@ b) If Hit by Pitches per PA were to be added to this model, would you expect the
 \
 \
 **I would expect the coefficient for BB% to decrease if Hit By Pitches per PA were added**
-**since BB% is very likely directly correlated to ERA as well as the fact that HBP/PA**
-**is a subset of BB%. This would split the effect that BB% has on ERA into BB% and HBP/PA, and** 
-**therefore decreasing the value of the coefficient on BB% in exchange for the added coefficient on HBP/PA.** 
+**since both BB% and HBP/PA are likely directly correlated to ERA. Therefore,**
+**adding HBP/PA would off-load some of the explanation that BB% has on ERA, and**
+**in turn decreasing the coefficient on BB%**
 \
 \
 
